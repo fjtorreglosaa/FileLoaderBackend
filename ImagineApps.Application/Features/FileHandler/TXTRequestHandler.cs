@@ -31,7 +31,15 @@ namespace ImagineApps.Application.Features.FileHandler
             var folder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             folder = Path.Combine(folder, "Downloads");
             var filename = $"{data.Result.FileName}{StringConstants.TXT_EXTENSION}";
-            var detination = $"{folder}/{filename}";
+            var detination = $"{folder}\\{filename}";
+
+            if (File.Exists(detination))
+            {
+                string[] files = Directory.GetFiles(folder);
+                var duplicates = files.Where(x => x.Contains(data.Result.FileName)).Count();
+                filename = $"{data.Result.FileName} ({duplicates + 1}){StringConstants.TXT_EXTENSION}";
+                detination = $"{folder}\\{filename}";
+            }
 
             try
             {
@@ -55,7 +63,7 @@ namespace ImagineApps.Application.Features.FileHandler
         {
             var fileData = await _txt.ReadFile(path);
 
-            if (fileData.ErrorMessage != null)
+            if (fileData.ErrorMessage == null)
             {
                 var fileNormalizedData = TXTHelper.NormalizeInputData(fileData.Data);
                 var bank = await _mediator.Send(new GetBankByIdQuery { BankId = fileNormalizedData.Header.BankId });

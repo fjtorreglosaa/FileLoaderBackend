@@ -30,6 +30,5 @@
         public const int CONCEPT_START = 152;
         public const int CONCEPT_LENGTH = 30;
         public const int BENEFITDESCRIPTION_START = 182;
-        public const int BENEFITDESCRIPTION_LENGTH = 30;
     }
 }

@@ -3,7 +3,7 @@
     internal static class SQLBank
     {
         public static string GetBankById 
-            = $@"SELECT Bank_ID WITH NOLOCK
+            = $@"SELECT Bank_ID
                   ,Bank_Name
                   ,FontID
                   ,Def_Account_Mask
@@ -36,7 +36,7 @@
               WHERE Bank_ID = @Bank_ID";
 
         public static string GetBanks
-            = $@"SELECT Bank_ID WITH NOLOCK
+            = $@"SELECT Bank_ID
                   ,Bank_Name
                   ,FontID
                   ,Def_Account_Mask
