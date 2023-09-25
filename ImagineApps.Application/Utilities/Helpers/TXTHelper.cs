@@ -83,7 +83,7 @@ namespace ImagineApps.Application.Utilities.Helpers
                 currency = StringConstants.CURRENCY_02;
             }
 
-            if (string.IsNullOrEmpty(currency)) return (null, $"The file could not be processed, no AccountID was found with the provided id: {data.Header.AccountID}.");
+            if (string.IsNullOrEmpty(currency)) return (null, $"Unable to continue, please check the file you are trying to upload and verify if the information and format are correct. ");
 
             var currentDate = DateTime.Now.ToString("ddMMyyyy").Replace(" ", "");
             var outputNmae = $"CHECK_AFT_{currentDate}";
