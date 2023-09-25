@@ -1,4 +1,5 @@
 ﻿using ImagineApps.Infrastructure.ExternalResources.Contracts;
+using System.IO;
 
 namespace ImagineApps.Infrastructure.ExternalResources
 {
@@ -26,6 +27,30 @@ namespace ImagineApps.Infrastructure.ExternalResources
 			{
 				return (null, $"Unable to read data: {ex.ToString}");
 			}
+        }
+
+        public async Task<(List<string> Data, string ErrorMessage)> ReadFile(StreamReader reader)
+        {
+            var lines = new List<string>();
+
+            try
+            {
+                using (reader)
+                {
+                    string line;
+
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        lines.Add(line);
+                    }
+                }
+
+                return (lines, null);
+            }
+            catch (Exception ex)
+            {
+                return (null, $"Unable to read data: {ex.ToString}");
+            }
         }
     }
 }

@@ -1,8 +1,9 @@
 using ImagineApps.Application.Features.Bank.Queries.GetBankById;
-using ImagineApps.Application.Features.FileHandler;
+using ImagineApps.Application.Features.FileHandler.Commands.TXTFromPath;
 using ImagineApps.Application.Utilities;
 using ImagineApps.Infrastructure.UnitOfWork.Contracts;
 using ImagineApps.Infrastructure.UnitOfWork.Dapper;
+using Microsoft.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,16 +13,16 @@ builder.Services.AddControllers();
 
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining(typeof(GetBankByIdQueryHandler)));
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining(typeof(TXTRequestHandler)));
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining(typeof(TXTRequestFromPathHandler)));
 builder.Services.AddAutoMapper(typeof(Mappings));
 
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(builder =>
+    options.AddPolicy("Policy", builder =>
     {
+        builder.WithOrigins("http://localhost:3000");
         builder.AllowAnyHeader();
         builder.AllowAnyMethod();
-        builder.AllowAnyOrigin();
     });
 });
 
@@ -38,7 +39,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors();
+app.UseCors("Policy");
 
 app.UseHttpsRedirection();
 

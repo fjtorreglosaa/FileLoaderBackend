@@ -3,29 +3,43 @@ using ImagineApps.Application.Features.FileHandler.Contracts;
 using ImagineApps.Application.Utilities;
 using ImagineApps.Application.Utilities.Dtos;
 using ImagineApps.Application.Utilities.Helpers;
-using ImagineApps.Infrastructure.ExternalResources;
 using ImagineApps.Infrastructure.ExternalResources.Contracts;
 using MediatR;
 
-namespace ImagineApps.Application.Features.FileHandler
+namespace ImagineApps.Application.Features.FileHandler.Commands
 {
-    public class TXTRequestHandler : IRequestHandler<TXTRequest, string>, ITXTHandler
+    public class TXTHandler : ITXTHandler
     {
-        private readonly ITXT _txt;
-        private IMediator _mediator;
+        protected IMediator _Mediator;
+        protected ITXT _TXT;
 
-        public TXTRequestHandler(IMediator mediator)
+        public TXTHandler(IMediator mediator, ITXT txt)
         {
-            _txt = new TXT();
-            _mediator = mediator;
+            _Mediator = mediator;
+            _TXT = txt;
         }
 
-        public async Task<string> Handle(TXTRequest request, CancellationToken cancellationToken)
+        public async Task<(FileInformationOutputDto Result, string ErrorMessage)> GetOutputs(BaseOutputDataDto output)
         {
-            if (!request.filePath.EndsWith(".txt", StringComparison.OrdinalIgnoreCase)) return "The file extension is not valid, extension must be .txt";
+            if (output.ErrorMessage == null)
+            {
+                var fileNormalizedData = TXTHelper.NormalizeInputData(output.Data);
+                var bank = await _Mediator.Send(new GetBankByIdQuery { BankId = fileNormalizedData.Header.BankId });
+                var outputData = TXTHelper.GetOutputData(fileNormalizedData, bank);
 
-            var data = await GetOutputData(request.filePath);
+                if (outputData.ErrorMessage != null)
+                {
+                    return (null, outputData.ErrorMessage);
+                }
 
+                return (outputData.Result, null);
+            }
+
+            return (null, "Unexpected failure, the file could not be processed.");
+        }
+
+        public string OutputResult(FinalOutputDataDto data)
+        {
             if (data.ErrorMessage != null) return data.ErrorMessage;
 
             var folder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
@@ -57,27 +71,6 @@ namespace ImagineApps.Application.Features.FileHandler
             {
                 return e.Message;
             }
-        }
-
-        public async Task<(FileInformationOutputDto Result, string ErrorMessage)> GetOutputData(string path)
-        {
-            var fileData = await _txt.ReadFile(path);
-
-            if (fileData.ErrorMessage == null)
-            {
-                var fileNormalizedData = TXTHelper.NormalizeInputData(fileData.Data);
-                var bank = await _mediator.Send(new GetBankByIdQuery { BankId = fileNormalizedData.Header.BankId });
-                var outputData = TXTHelper.GetOutputData(fileNormalizedData, bank);
-
-                if (outputData.ErrorMessage != null)
-                {
-                    return (null, outputData.ErrorMessage);
-                }
-
-                return (outputData.Result, null);
-            }
-
-            return (null, "Unexpected failure, the file could not be processed.");
         }
     }
 }
