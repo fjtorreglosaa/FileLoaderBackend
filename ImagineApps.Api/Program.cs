@@ -1,9 +1,11 @@
 using ImagineApps.Application.Features.Bank.Queries.GetBankById;
 using ImagineApps.Application.Features.FileHandler.Commands.TXTFromPath;
+using ImagineApps.Application.Features.FileHandler.Commands.TXTFromStream;
 using ImagineApps.Application.Utilities;
+using ImagineApps.Infrastructure.ExternalResources;
+using ImagineApps.Infrastructure.ExternalResources.Contracts;
 using ImagineApps.Infrastructure.UnitOfWork.Contracts;
 using ImagineApps.Infrastructure.UnitOfWork.Dapper;
-using Microsoft.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,8 +14,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
+builder.Services.AddTransient<ITXT, TXT>();
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining(typeof(GetBankByIdQueryHandler)));
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining(typeof(TXTRequestFromPathHandler)));
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining(typeof(TXTFromStreamRequestHandler)));
 builder.Services.AddAutoMapper(typeof(Mappings));
 
 builder.Services.AddCors(options =>
